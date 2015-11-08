@@ -1,12 +1,12 @@
 {
-  "author": "Alsmile",
+  "author": "Phox",
   "name": "angular ngEditor",
   "description": "Angular WYSIWYG editor",
   "version": "0.0.1",
-  "homepage": "https://github.com/Alsmile/ngEditor",
+  "homepage": "https://github.com/phox/ngEditor",
   "main": "./src/ngEditor.js",
   "dependencies": {
     "angular": ">= 1.0.0",
-    "angular-file-upload": ">= 1.1.5"
+    "ng-file-upload-shim": "~9.0.4"
   }
 }
