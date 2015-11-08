@@ -11,7 +11,7 @@
   }
 }(this, function (angular) {
 'use strict';
-  var module = angular.module('ngEditor', ['angularFileUpload']);
+  var module = angular.module('ngEditor', ['ngFileUpload']);
 
   module.factory('NgEditor', [ '$rootScope', '$compile',
     function($rootScope, $compile) {
@@ -128,7 +128,7 @@
     };
   }]);
 
-  module.directive('ngEditor', ['$rootScope', '$window', '$document', '$http', 'NgEditor', 'FileUploader', function($rootScope, $window, $document, $http, NgEditor, FileUploader) {
+  module.directive('ngEditor', ['$rootScope', '$window', '$document', '$http', 'NgEditor', 'Upload', function($rootScope, $window, $document, $http, NgEditor, Upload) {
     return {
       restrict: 'E',
       template: '<div class="ng-editor">' +
@@ -148,7 +148,7 @@
     													'<label ng-if="subItem.color" class="fa fa-square" style="color:{{subItem.val}}"></label>' +
     												'</button>' +
     												'<label ng-if="subItem.separator" class="separator-h"></label>' +
-    												'<input ng-if="subItem.isUpload" type="file" nv-file-select="" uploader="uploader"  />' +
+    												'<input ng-if="subItem.isUpload" type="file" ngf-select="upload($file)" accept="image/*"  />' +
 			                 		'</div>' +
 												'</div>' +
 											'</div> ' +
@@ -541,25 +541,19 @@
           document.execCommand(cmd, b, val);
         };
 
-        // Upload image by FileUploader.
-        $scope.uploader = new FileUploader({
-          url: $scope.editor.options.uploadUrl,
-          headers : $scope.editor.options.uploadHeaders ,
-          autoUpload: true
-        });
-
-        $scope.uploadProgress = 100;
-        $scope.uploader.onBeforeUploadItem = function(item) {
-          $scope.uploadProgress = 0;
-        };
-
-        $scope.uploader.onProgressItem = function(fileItem, progress) {
-          $scope.uploadProgress = progress;
-        };
-
-        $scope.uploader.onSuccessItem = function(fileItem, response, status, headers) {
-          document.execCommand('insertImage', false, response.url);
-        };
+        // Upload image.
+        $scope.upload = function (file) {
+          Upload.upload({
+            url: $scope.editor.options.uploadUrl,
+            data: {file: file}
+          }).then(function (resp) {
+            document.execCommand('insertImage', false, resp.data[0].fileurl);	
+          }, function (resp) {
+          	
+          }, function (evt) {
+            $scope.uploadProgress = parseInt(100 * evt.loaded / evt.total);	
+          });
+        }
 
         // Events of editor.
         $scope.editor._onContentChanged = function (html, catalogs, title, abstract) {
